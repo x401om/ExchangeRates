@@ -152,9 +152,18 @@
     }
   });
   
+  __weak typeof(self) weakSelf = self;
   [[self.presenter sync] continueWithExecutor:BFExecutor.mainThreadExecutor withBlock:^id _Nullable(BFTask * _Nonnull t) {
     synced = YES;
     [SVProgressHUD dismiss];
+    if (t.error) {
+      NSString *msg = @"Something went wrong, try again later!";
+      UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                     message:msg
+                                                              preferredStyle:UIAlertControllerStyleAlert];
+      [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+      [weakSelf presentViewController:alert animated:YES completion:nil];
+    }
     return t;
   }];
 }
